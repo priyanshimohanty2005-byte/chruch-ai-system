@@ -1,0 +1,20 @@
+{
+  "name": "church-ai-mcp",
+  "version": "1.0.0",
+  "description": "Remote MCP server exposing Planning Center Services to Claude, deployable on Render.",
+  "type": "module",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.13.0",
+    "express": "^4.21.2",
+    "zod": "^3.24.1"
+  }
+}

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: church-ai-mcp
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: PCO_APP_ID
+        sync: false
+      - key: PCO_SECRET
+        sync: false
+      - key: MCP_AUTH_TOKEN
+        sync: false
