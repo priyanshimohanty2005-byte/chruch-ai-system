@@ -16,8 +16,6 @@ const app = express();
 app.use(express.json());
 
 // One MCP server + transport per active session, kept in memory.
-// Fine for a single Render instance; if you ever scale to multiple
-// instances you'd need a shared session store instead.
 const transports = {};
 
 function buildServer() {
@@ -124,6 +122,9 @@ function buildServer() {
   return server;
 }
 
+// --- AUTH TEMPORARILY DISABLED FOR INITIAL TESTING ---
+// checkAuth() is no longer called below. Your server currently accepts
+// requests from anyone who has the URL. Re-enable before real church use.
 function checkAuth(req, res) {
   const expected = process.env.MCP_AUTH_TOKEN;
   if (!expected) {
@@ -141,8 +142,6 @@ function checkAuth(req, res) {
 
 // --- MCP endpoint: client-to-server messages, including session init ---
 app.post("/mcp", async (req, res) => {
-  if (!checkAuth(req, res)) return;
-
   try {
     const sessionId = req.headers["mcp-session-id"];
     let transport;
@@ -187,7 +186,6 @@ app.post("/mcp", async (req, res) => {
 
 // --- MCP endpoint: server-to-client stream (notifications) ---
 app.get("/mcp", async (req, res) => {
-  if (!checkAuth(req, res)) return;
   const sessionId = req.headers["mcp-session-id"];
   if (!sessionId || !transports[sessionId]) {
     res.status(400).send("Invalid or missing session ID");
@@ -198,7 +196,6 @@ app.get("/mcp", async (req, res) => {
 
 // --- MCP endpoint: session termination ---
 app.delete("/mcp", async (req, res) => {
-  if (!checkAuth(req, res)) return;
   const sessionId = req.headers["mcp-session-id"];
   if (!sessionId || !transports[sessionId]) {
     res.status(400).send("Invalid or missing session ID");
@@ -207,7 +204,7 @@ app.delete("/mcp", async (req, res) => {
   await transports[sessionId].handleRequest(req, res);
 });
 
-// Health check (also what Render pings to confirm the service is alive)
+// Health check
 app.get("/", (req, res) => {
   res.status(200).send("Church AI MCP server is running.");
 });
